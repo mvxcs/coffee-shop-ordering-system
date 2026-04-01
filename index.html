@@ -1,0 +1,1648 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>COFFEE VIP Demo</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Tajawal:wght@500;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    :root{
+      --bg:#0f0906;
+      --bg2:#1b110c;
+      --panel:rgba(255,255,255,0.08);
+      --panel-line:rgba(255,255,255,0.10);
+      --card:#f6efe7;
+      --card2:#efe1d2;
+      --text:#2b1a12;
+      --muted:#756256;
+      --gold:#d1a678;
+      --gold2:#a25d32;
+      --white:#fff;
+      --shadow:0 16px 40px rgba(0,0,0,0.28);
+    }
+
+    *{
+      box-sizing:border-box;
+      -webkit-tap-highlight-color:transparent;
+    }
+
+    html{scroll-behavior:smooth;}
+
+    body{
+      margin:0;
+      color:var(--white);
+      font-family:"Inter","Tajawal",system-ui,sans-serif;
+      background:
+        radial-gradient(circle at top left, rgba(209,166,120,0.12), transparent 24%),
+        radial-gradient(circle at top right, rgba(209,166,120,0.08), transparent 18%),
+        linear-gradient(rgba(10,6,4,0.82), rgba(10,6,4,0.94)),
+        url("spanish-latte.jpg") center/cover no-repeat fixed;
+      min-height:100vh;
+      overflow-x:hidden;
+    }
+
+    .page{
+      max-width:430px;
+      margin:0 auto;
+      padding:16px 14px 120px;
+    }
+
+    .hero{
+      position:relative;
+      overflow:hidden;
+      background:linear-gradient(135deg, rgba(255,255,255,0.09), rgba(255,255,255,0.03));
+      border:1px solid var(--panel-line);
+      backdrop-filter:blur(14px);
+      border-radius:30px;
+      padding:18px;
+      box-shadow:var(--shadow);
+      margin-bottom:14px;
+    }
+
+    .hero::after{
+      content:"";
+      position:absolute;
+      width:170px;
+      height:170px;
+      border-radius:50%;
+      background:radial-gradient(circle, rgba(209,166,120,0.18), transparent 70%);
+      top:-70px;
+      right:-50px;
+      pointer-events:none;
+    }
+
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      position:relative;
+      z-index:1;
+    }
+
+    .logo{
+      width:62px;
+      height:62px;
+      border-radius:50%;
+      object-fit:cover;
+      background:#fff;
+      border:2px solid rgba(255,255,255,0.85);
+      box-shadow:0 8px 18px rgba(0,0,0,0.18);
+      flex-shrink:0;
+    }
+
+    .brand h1{
+      margin:0;
+      font-size:30px;
+      line-height:1;
+      font-weight:800;
+      letter-spacing:-0.8px;
+    }
+
+    .brand p{
+      margin:8px 0 0;
+      color:rgba(255,255,255,0.74);
+      font-size:13px;
+      font-weight:600;
+      line-height:1.7;
+    }
+
+    .lang-switcher,
+    .tabs{
+      display:flex;
+      gap:8px;
+      overflow-x:auto;
+      scrollbar-width:none;
+      padding-bottom:2px;
+      margin-bottom:14px;
+    }
+
+    .lang-switcher::-webkit-scrollbar,
+    .tabs::-webkit-scrollbar{display:none;}
+
+    .lang-btn,
+    .tab-btn{
+      border:1px solid rgba(255,255,255,0.12);
+      background:rgba(255,255,255,0.07);
+      color:rgba(255,255,255,0.9);
+      border-radius:999px;
+      padding:10px 14px;
+      font-family:inherit;
+      font-size:13px;
+      font-weight:800;
+      white-space:nowrap;
+      cursor:pointer;
+      backdrop-filter:blur(10px);
+      transition:0.18s ease;
+    }
+
+    .lang-btn.active,
+    .tab-btn.active{
+      background:linear-gradient(180deg, #c89264 0%, #8e5330 100%);
+      color:#fff;
+      border-color:transparent;
+      box-shadow:0 10px 20px rgba(142,83,48,0.28);
+    }
+
+    .featured-wrap{
+      position:relative;
+      height:270px;
+      margin-bottom:16px;
+      border-radius:30px;
+      overflow:hidden;
+      box-shadow:var(--shadow);
+    }
+
+    .slide{
+      position:absolute;
+      inset:0;
+      opacity:0;
+      transform:translateX(20px);
+      transition:opacity .6s ease, transform .6s ease;
+      pointer-events:none;
+    }
+
+    .slide.active{
+      opacity:1;
+      transform:translateX(0);
+      pointer-events:auto;
+    }
+
+    .slide img{
+      width:100%;
+      height:100%;
+      object-fit:cover;
+      display:block;
+    }
+
+    .slide-overlay{
+      position:absolute;
+      inset:0;
+      background:linear-gradient(180deg, rgba(0,0,0,0.08), rgba(0,0,0,0.75));
+      display:flex;
+      flex-direction:column;
+      justify-content:flex-end;
+      padding:18px;
+    }
+
+    .slide-badge{
+      align-self:flex-start;
+      background:rgba(255,255,255,0.16);
+      border:1px solid rgba(255,255,255,0.12);
+      backdrop-filter:blur(8px);
+      border-radius:999px;
+      padding:8px 12px;
+      font-size:12px;
+      font-weight:800;
+      margin-bottom:10px;
+    }
+
+    .slide h2{
+      margin:0 0 6px;
+      font-size:28px;
+      line-height:1.15;
+      font-weight:800;
+      letter-spacing:-0.6px;
+    }
+
+    .slide p{
+      margin:0 0 12px;
+      color:rgba(255,255,255,0.82);
+      font-size:13px;
+      font-weight:600;
+      line-height:1.7;
+      max-width:85%;
+    }
+
+    .slide-price{
+      font-size:24px;
+      font-weight:800;
+      color:#fff;
+    }
+
+    .slide-dots{
+      position:absolute;
+      top:14px;
+      left:14px;
+      display:flex;
+      gap:6px;
+      z-index:2;
+    }
+
+    .dot{
+      width:8px;
+      height:8px;
+      border-radius:50%;
+      background:rgba(255,255,255,0.35);
+    }
+
+    .dot.active{
+      background:#fff;
+    }
+
+    .section-head{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      margin:4px 0 14px;
+    }
+
+    .section-title{
+      margin:0;
+      font-size:22px;
+      font-weight:800;
+      color:#fff;
+    }
+
+    .section-sub{
+      font-size:12px;
+      color:rgba(255,255,255,0.66);
+      font-weight:700;
+    }
+
+    .grid{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:12px;
+    }
+
+    .card{
+      overflow:hidden;
+      border-radius:24px;
+      background:linear-gradient(180deg, rgba(246,239,231,0.98), rgba(239,225,210,0.98));
+      color:var(--text);
+      box-shadow:var(--shadow);
+      border:1px solid rgba(255,255,255,0.14);
+    }
+
+    .card-image{
+      position:relative;
+      height:128px;
+      overflow:hidden;
+    }
+
+    .card-image img{
+      width:100%;
+      height:100%;
+      object-fit:cover;
+      display:block;
+    }
+
+    .mini-pill{
+      position:absolute;
+      top:10px;
+      right:10px;
+      background:rgba(255,255,255,0.92);
+      color:var(--text);
+      border-radius:999px;
+      padding:6px 10px;
+      font-size:11px;
+      font-weight:800;
+      box-shadow:0 6px 16px rgba(0,0,0,0.12);
+    }
+
+    .card-body{
+      padding:12px;
+    }
+
+    .name-row{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:8px;
+      margin-bottom:5px;
+    }
+
+    .name{
+      margin:0;
+      font-size:15px;
+      line-height:1.4;
+      font-weight:800;
+      color:var(--text);
+    }
+
+    .rating{
+      background:#f1ddc8;
+      color:var(--gold2);
+      border-radius:12px;
+      padding:6px 8px;
+      font-size:11px;
+      font-weight:800;
+      white-space:nowrap;
+    }
+
+    .subname{
+      margin:0 0 8px;
+      color:var(--muted);
+      font-size:11px;
+      font-weight:700;
+      line-height:1.5;
+    }
+
+    .price{
+      margin:0 0 10px;
+      color:var(--gold2);
+      font-size:17px;
+      font-weight:800;
+    }
+
+    .sizes{
+      display:flex;
+      gap:6px;
+      flex-wrap:wrap;
+      margin-bottom:10px;
+    }
+
+    .size{
+      padding:6px 10px;
+      border-radius:999px;
+      background:#f3e7da;
+      color:var(--text);
+      font-size:11px;
+      font-weight:800;
+      cursor:pointer;
+      user-select:none;
+    }
+
+    .size.active{
+      background:linear-gradient(180deg, #b06a3e 0%, #7b4426 100%);
+      color:#fff;
+    }
+
+    .desc{
+      margin:0 0 12px;
+      font-size:11px;
+      line-height:1.7;
+      color:#625044;
+      font-weight:700;
+      min-height:54px;
+    }
+
+    .action-row{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:8px;
+    }
+
+    .qty{
+      display:flex;
+      align-items:center;
+      gap:7px;
+      background:#f3e4d6;
+      border-radius:999px;
+      padding:4px 6px;
+    }
+
+    .qty-btn{
+      width:28px;
+      height:28px;
+      border:0;
+      border-radius:50%;
+      background:var(--gold2);
+      color:#fff;
+      font-size:16px;
+      font-weight:800;
+      cursor:pointer;
+    }
+
+    .qty span{
+      min-width:14px;
+      text-align:center;
+      font-size:13px;
+      font-weight:800;
+      color:var(--text);
+    }
+
+    .add-btn{
+      flex:1;
+      border:0;
+      border-radius:14px;
+      padding:10px 12px;
+      background:linear-gradient(180deg, #b06a3e 0%, #7b4426 100%);
+      color:#fff;
+      font-family:inherit;
+      font-size:13px;
+      font-weight:800;
+      cursor:pointer;
+      box-shadow:0 10px 18px rgba(123,68,38,0.2);
+    }
+
+    .bottom-bar{
+      position:fixed;
+      left:0;
+      right:0;
+      bottom:0;
+      padding:10px 14px 14px;
+      background:rgba(15,9,6,0.88);
+      backdrop-filter:blur(12px);
+      border-top:1px solid rgba(255,255,255,0.08);
+      z-index:50;
+      box-shadow:0 -10px 24px rgba(0,0,0,0.2);
+    }
+
+    .bottom-inner{
+      max-width:430px;
+      margin:0 auto;
+    }
+
+    .cart-info{
+      text-align:center;
+      font-size:13px;
+      font-weight:800;
+      color:rgba(255,255,255,0.9);
+      margin-bottom:10px;
+    }
+
+    .bottom-actions{
+      display:grid;
+      grid-template-columns:96px 1fr;
+      gap:10px;
+    }
+
+    .cart-btn,
+    .order-btn{
+      border:0;
+      border-radius:16px;
+      padding:14px;
+      font-family:inherit;
+      font-size:14px;
+      font-weight:800;
+      cursor:pointer;
+    }
+
+    .cart-btn{
+      background:rgba(255,255,255,0.10);
+      color:#fff;
+      border:1px solid rgba(255,255,255,0.08);
+    }
+
+    .order-btn{
+      background:linear-gradient(180deg, #c89264 0%, #8e5330 100%);
+      color:#fff;
+      box-shadow:0 10px 20px rgba(142,83,48,0.24);
+    }
+
+    .cart-overlay{
+      position:fixed;
+      inset:0;
+      background:rgba(0,0,0,0.4);
+      opacity:0;
+      pointer-events:none;
+      transition:.25s ease;
+      z-index:70;
+    }
+
+    .cart-overlay.show{
+      opacity:1;
+      pointer-events:auto;
+    }
+
+    .cart-panel{
+      position:fixed;
+      left:0;
+      right:0;
+      bottom:-100%;
+      max-width:430px;
+      margin:0 auto;
+      background:#fff;
+      color:var(--text);
+      border-radius:26px 26px 0 0;
+      min-height:48vh;
+      max-height:78vh;
+      overflow:hidden;
+      transition:.3s ease;
+      z-index:80;
+      box-shadow:0 -10px 28px rgba(0,0,0,0.18);
+    }
+
+    .cart-panel.show{
+      bottom:0;
+    }
+
+    .cart-head{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      padding:14px;
+      border-bottom:1px solid #eee1d5;
+    }
+
+    .cart-head h3{
+      margin:0;
+      font-size:18px;
+      font-weight:800;
+    }
+
+    .close-cart{
+      width:36px;
+      height:36px;
+      border:0;
+      border-radius:10px;
+      background:#f2e6d9;
+      color:var(--text);
+      font-size:18px;
+      font-weight:800;
+      cursor:pointer;
+    }
+
+    .cart-body{
+      max-height:calc(78vh - 64px);
+      overflow-y:auto;
+      padding:14px 14px 120px;
+    }
+
+    .empty-cart{
+      text-align:center;
+      color:#7c6557;
+      font-size:14px;
+      font-weight:800;
+      padding:24px 0;
+    }
+
+    .cart-item{
+      background:#fffaf5;
+      border:1px solid #f0e3d7;
+      border-radius:18px;
+      padding:12px;
+      margin-bottom:10px;
+    }
+
+    .cart-item-top{
+      display:flex;
+      justify-content:space-between;
+      gap:10px;
+      margin-bottom:10px;
+    }
+
+    .cart-item-name{
+      margin:0;
+      font-size:15px;
+      font-weight:800;
+      line-height:1.5;
+    }
+
+    .cart-item-sub{
+      margin-top:4px;
+      color:#7a6557;
+      font-size:12px;
+      font-weight:700;
+    }
+
+    .remove-btn{
+      border:0;
+      background:#fff;
+      color:#a25d32;
+      border-radius:10px;
+      padding:8px 10px;
+      font-family:inherit;
+      font-size:12px;
+      font-weight:800;
+      cursor:pointer;
+      box-shadow:0 3px 10px rgba(0,0,0,0.04);
+      white-space:nowrap;
+    }
+
+    .summary{
+      background:#f3e6d9;
+      border-radius:18px;
+      padding:12px;
+      margin-top:12px;
+    }
+
+    .summary-line{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      font-size:14px;
+      font-weight:800;
+      color:var(--text);
+      margin-bottom:8px;
+    }
+
+    .summary-line:last-child{
+      margin-bottom:0;
+      font-size:16px;
+      color:#7b4426;
+    }
+
+    .toast{
+      position:fixed;
+      top:18px;
+      left:50%;
+      transform:translateX(-50%) translateY(-20px);
+      background:#2f1b12;
+      color:#fff;
+      padding:11px 16px;
+      border-radius:14px;
+      font-size:13px;
+      font-weight:800;
+      opacity:0;
+      pointer-events:none;
+      transition:.28s ease;
+      z-index:200;
+      box-shadow:0 10px 22px rgba(0,0,0,0.16);
+    }
+
+    .toast.show{
+      opacity:1;
+      transform:translateX(-50%) translateY(0);
+    }
+
+    .my-orders-fab{
+      position: fixed;
+      top: 14px;
+      left: 14px;
+      z-index: 120;
+      border: 0;
+      border-radius: 999px;
+      padding: 12px 14px;
+      background: rgba(255,255,255,0.12);
+      color: #fff;
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255,255,255,0.12);
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 800;
+      cursor: pointer;
+      box-shadow: 0 10px 24px rgba(0,0,0,0.18);
+    }
+
+    .my-orders-badge{
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 20px;
+      height: 20px;
+      margin-inline-start: 6px;
+      padding: 0 6px;
+      border-radius: 999px;
+      background: #c89264;
+      color: #fff;
+      font-size: 11px;
+      font-weight: 800;
+    }
+
+    .orders-top-overlay{
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.34);
+      opacity: 0;
+      pointer-events: none;
+      transition: .25s ease;
+      z-index: 130;
+    }
+
+    .orders-top-overlay.show{
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .orders-drawer{
+      position: fixed;
+      top: -100%;
+      left: 0;
+      right: 0;
+      max-width: 430px;
+      margin: 0 auto;
+      background: #fff;
+      color: #2b1a12;
+      border-radius: 0 0 26px 26px;
+      min-height: 34vh;
+      max-height: 75vh;
+      overflow: hidden;
+      transition: .3s ease;
+      z-index: 140;
+      box-shadow: 0 16px 40px rgba(0,0,0,0.22);
+    }
+
+    .orders-drawer.show{
+      top: 0;
+    }
+
+    .orders-drawer-head{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      padding:14px;
+      border-bottom:1px solid #eee1d5;
+    }
+
+    .orders-drawer-title{
+      margin:0;
+      font-size:18px;
+      font-weight:800;
+    }
+
+    .orders-drawer-close{
+      width:36px;
+      height:36px;
+      border:0;
+      border-radius:10px;
+      background:#f2e6d9;
+      color:#2b1a12;
+      font-size:18px;
+      font-weight:800;
+      cursor:pointer;
+    }
+
+    .orders-drawer-body{
+      max-height: calc(75vh - 64px);
+      overflow-y: auto;
+      padding: 14px 14px 40px;
+      background: #faf6f1;
+    }
+
+    .customer-order-card{
+      background:#fff;
+      border:1px solid #ecdccc;
+      border-radius:18px;
+      padding:12px;
+      margin-bottom:10px;
+      box-shadow: 0 6px 16px rgba(0,0,0,0.05);
+    }
+
+    .customer-order-top{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:10px;
+      margin-bottom:10px;
+    }
+
+    .customer-order-id{
+      margin:0;
+      font-size:16px;
+      font-weight:800;
+      color:#2b1a12;
+    }
+
+    .customer-order-meta{
+      color:#7a6557;
+      font-size:12px;
+      font-weight:700;
+      line-height:1.7;
+      margin-top:4px;
+    }
+
+    .customer-order-status{
+      padding:8px 10px;
+      border-radius:999px;
+      font-size:12px;
+      font-weight:800;
+      white-space:nowrap;
+    }
+
+    .customer-order-status.new{
+      background:#f3e4d6;
+      color:#9b5a33;
+    }
+
+    .customer-order-status.preparing{
+      background:#fff1c9;
+      color:#9c6a00;
+    }
+
+    .customer-order-status.ready{
+      background:#dff7e7;
+      color:#1e7a49;
+    }
+
+    .customer-order-status.done{
+      background:#ececec;
+      color:#666;
+    }
+
+    .customer-order-items{
+      background:#fffaf5;
+      border:1px solid #f0e3d7;
+      border-radius:14px;
+      padding:10px;
+    }
+
+    .customer-order-item{
+      padding:6px 0;
+      border-bottom:1px dashed #ead9cb;
+      font-size:13px;
+      font-weight:700;
+      color:#4a372c;
+    }
+
+    .customer-order-item:last-child{
+      border-bottom:0;
+    }
+
+    .customer-order-total{
+      margin-top:10px;
+      font-size:14px;
+      font-weight:800;
+      color:#7b4426;
+    }
+
+    .customer-empty-orders{
+      text-align:center;
+      color:#7a6557;
+      font-weight:800;
+      padding:24px 12px;
+    }
+
+    @media (max-width:360px){
+      .grid{grid-template-columns:1fr;}
+      .card-image{height:150px;}
+      .featured-wrap{height:240px;}
+    }
+    .card.sold-out{
+  opacity: 0.55;
+  filter: grayscale(1);
+}
+
+  .sold-out-badge{
+    position:absolute;
+    bottom:10px;
+    left:10px;
+    background:#7a7a7a;
+    color:#fff;
+     border-radius:999px;
+    padding:6px 10px;
+    font-size:11px;
+    font-weight:800;
+    z-index:2;
+}
+
+  .add-btn.disabled,
+  .qty-btn.disabled,
+  .size.disabled{
+  opacity:0.5;
+  pointer-events:none;
+}
+  </style>
+</head>
+
+<body>
+ <button class="my-orders-fab" id="myOrdersBtn" onclick="openOrdersDrawer()">
+  <span id="myOrdersText">طلباتي</span>
+  <span class="my-orders-badge" id="myOrdersCount">0</span>
+</button>
+
+  <div class="orders-top-overlay" id="ordersTopOverlay" onclick="closeOrdersDrawer()"></div>
+
+  <div class="orders-drawer" id="ordersDrawer">
+    <div class="orders-drawer-head">
+      <h3 class="orders-drawer-title" id="ordersDrawerTitle">طلباتك</h3>
+      <button class="orders-drawer-close" onclick="closeOrdersDrawer()">×</button>
+    </div>
+    <div class="orders-drawer-body" id="ordersDrawerBody">
+      <div class="customer-empty-orders" id="emptyOrdersText">ما عندك طلبات إلى الآن</div>
+    </div>
+  </div>
+
+  <div class="page">
+    <section class="hero">
+      <div class="brand">
+        <img src="logo.png" alt="COFFEE" class="logo">
+        <div>
+          <h1 id="brandTitle">COFFEE VIP</h1>
+          <p id="brandSubtitle">A premium experience inspired by coffee and dates</p>
+        </div>
+      </div>
+    </section>
+
+    <div class="lang-switcher" id="langSwitcher"></div>
+
+    <section class="featured-wrap">
+      <div class="slide-dots" id="slideDots"></div>
+
+      <article class="slide active" data-slide="0">
+        <img src="spanish-latte.jpg" alt="Spanish Latte">
+        <div class="slide-overlay">
+          <div class="slide-badge" id="featuredBadge1">Signature Coffee</div>
+          <h2 id="featuredTitle1">Spanish Latte</h2>
+          <p id="featuredDesc1">Creamy, balanced, and crafted for a luxurious café experience.</p>
+          <div class="slide-price">TRY 160</div>
+        </div>
+      </article>
+
+      <article class="slide" data-slide="1">
+        <img src="cheesecake.jpg" alt="Cheesecake">
+        <div class="slide-overlay">
+          <div class="slide-badge" id="featuredBadge2">Premium Dessert</div>
+          <h2 id="featuredTitle2">Cheesecake</h2>
+          <p id="featuredDesc2">Smooth, rich, and designed to complete a refined coffee moment.</p>
+          <div class="slide-price">TRY 120</div>
+        </div>
+      </article>
+    </section>
+
+    <div class="tabs" id="tabs"></div>
+
+    <div class="section-head">
+      <h2 class="section-title" id="sectionTitle">All</h2>
+      <div class="section-sub" id="sectionSub">VIP preview</div>
+    </div>
+
+    <section class="grid" id="grid"></section>
+
+    <section class="panel" style="margin-top:10px; background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.08); border-radius:20px; padding:12px; backdrop-filter:blur(10px);">
+      <h3 style="margin:0 0 10px; font-size:15px; font-weight:800; color:#fff;">معلومات الطلب</h3>
+      <div style="display:grid; gap:8px;">
+        <input id="customerName" type="text" placeholder="الاسم الكامل"
+          style="width:100%; padding:12px; border-radius:12px; border:1px solid rgba(255,255,255,0.15); background:rgba(255,255,255,0.06); color:#fff; font:inherit; outline:none;">
+        <input id="customerPhone" type="tel" placeholder="رقم الجوال"
+          style="width:100%; padding:12px; border-radius:12px; border:1px solid rgba(255,255,255,0.15); background:rgba(255,255,255,0.06); color:#fff; font:inherit; outline:none;">
+      </div>
+    </section>
+  </div>
+
+  <div class="bottom-bar">
+    <div class="bottom-inner">
+      <div class="cart-info" id="cartInfo">Items: 0 | Total: TRY 0.00</div>
+      <div class="bottom-actions">
+        <button class="cart-btn" id="cartBtn" onclick="openCart()">Cart (0)</button>
+        <button class="order-btn" id="orderBtn" onclick="sendOrder()">Send order</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="cart-overlay" id="cartOverlay" onclick="closeCart()"></div>
+
+  <div class="cart-panel" id="cartPanel">
+    <div class="cart-head">
+      <h3 id="cartTitle">Cart</h3>
+      <button class="close-cart" onclick="closeCart()">×</button>
+    </div>
+    <div class="cart-body" id="cartBody"></div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    const SUPABASE_URL = "https://nykpbfiwjujamxghwgto.supabase.co";
+    const SUPABASE_KEY = "sb_publishable_FzncDW28HfkBkAfHjVN7SA_8aZIy1_M";
+    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    let currentLang = "ar";
+    let currentTab = "all";
+    let cart = {};
+    let selectedSizes = {};
+    let stockMap = {};
+
+   function isProductAvailable(productId) {
+   return stockMap[productId] !== false;
+    }
+
+  async function loadStockStatus() {
+  const { data, error } = await supabaseClient
+    .from("product_stock")
+    .select("*");
+
+  if (error) {
+    console.error("loadStockStatus error:", error);
+    return;
+  }
+
+  stockMap = {};
+  (data || []).forEach(item => {
+    stockMap[item.product_id] = item.is_available;
+  });
+
+  // حذف المنتجات المنتهية من السلة
+  let cartChanged = false;
+
+  Object.keys(cart).forEach(id => {
+    const productId = Number(id);
+    if (!isProductAvailable(productId)) {
+      delete cart[productId];
+      cartChanged = true;
+    }
+  });
+
+  renderProducts();
+
+  if (cartChanged) {
+    renderCart();
+    updateCartInfo();
+    updateCartButton();
+    showToast(currentLang === "ar" ? "تم حذف منتج غير متوفر من السلة" : currentLang === "tr" ? "Tükenen ürün sepetten kaldırıldı" : "Unavailable item removed from cart");
+  }
+}
+    let customerOrders = JSON.parse(localStorage.getItem("COFFEECustomerOrders") || "[]");
+
+
+    function saveCustomerOrders() {
+      localStorage.setItem("COFFEECustomerOrders", JSON.stringify(customerOrders));
+    }
+
+    function openOrdersDrawer() {
+      document.getElementById("ordersTopOverlay").classList.add("show");
+      document.getElementById("ordersDrawer").classList.add("show");
+    }
+
+    function closeOrdersDrawer() {
+      document.getElementById("ordersTopOverlay").classList.remove("show");
+      document.getElementById("ordersDrawer").classList.remove("show");
+    }
+
+    function getStatusLabel(status) {
+      const labels = {
+        ar: { new: "جديد", preparing: "قيد التحضير", ready: "جاهز", done: "جاهز" },
+        en: { new: "New", preparing: "Preparing", ready: "Ready", done: "Ready" },
+        tr: { new: "Yeni", preparing: "Hazırlanıyor", ready: "Hazır", done: "Hazır" }
+      };
+      return labels[currentLang]?.[status] || status;
+    }
+
+    function updateMyOrdersCount() {
+      const countEl = document.getElementById("myOrdersCount");
+      if (countEl) countEl.textContent = customerOrders.length;
+    }
+
+    function renderCustomerOrders() {
+      const box = document.getElementById("ordersDrawerBody");
+
+      if (!customerOrders.length) {
+        box.innerHTML = '<div class="customer-empty-orders">Empty Orders</div>';
+        updateMyOrdersCount();
+        return;
+      }
+
+      box.innerHTML = customerOrders.slice().reverse().map(order => `
+        <div class="customer-order-card">
+          <div class="customer-order-top">
+            <div>
+              <h4 class="customer-order-id">#${order.id}</h4>
+              <div class="customer-order-meta">
+                ${order.customer_name || "-"}<br>
+                ${new Date(order.created_at).toLocaleString()}
+              </div>
+            </div>
+
+            <div class="customer-order-status ${order.status || "new"}">
+              ${getStatusLabel(order.status || "new")}
+            </div>
+          </div>
+
+          <div class="customer-order-items">
+            ${(order.items || []).map(item => `
+              <div class="customer-order-item">
+                ${item.name} (${item.size}) × ${item.qty}
+              </div>
+            `).join("")}
+          </div>
+
+          <div class="customer-order-total">
+            ${currentLang === "ar" ? "الإجمالي" : currentLang === "tr" ? "Toplam" : "Total"}:
+            TRY ${Number(order.total || 0).toFixed(2)}
+          </div>
+        </div>
+      `).join("");
+
+      updateMyOrdersCount();
+    }
+
+    async function refreshCustomerOrdersStatus() {
+      if (!customerOrders.length) return;
+
+      const ids = customerOrders.map(order => order.id);
+
+      const { data, error } = await supabaseClient
+        .from("orders")
+        .select("id,status,created_at,total,items,customer_name")
+        .in("id", ids)
+        .order("created_at", { ascending: false });
+
+      if (error) {
+        console.error("refreshCustomerOrdersStatus error:", error);
+        return;
+      }
+
+      if (data) {
+        customerOrders = data;
+        saveCustomerOrders();
+        renderCustomerOrders();
+      }
+    }
+
+    const texts = {
+      ar: {
+        brandTitle: "COFFEE  VIP",
+        
+        brandSubtitle: "تجربة فاخرة مستوحاة من القهوة والتمور",
+        featured1Badge: "قهوة مميزة",
+        featured1Title: "سبانش لاتيه",
+        featured1Desc: "مشروب كريمي متوازن ومصمم ليعطي تجربة كافيه راقية.",
+        featured2Badge: "حلى فاخر",
+        featured2Title: "تشيز كيك",
+        featured2Desc: "قوام ناعم وطعم غني يكمّل القهوة بأسلوب أنيق.",
+        tabs: { all: "الكل", cold: "المشروبات الباردة", dessert: "الحلى", dates: "التمور" },
+        sectionSub: "عرض VIP",
+        add: "أضف",
+        cart: "السلة",
+        cartButton: "السلة",
+        order: "ارسل الطلب",
+        items: "عدد المنتجات",
+        total: "الإجمالي",
+        each: "سعر الوحدة",
+        qty: "الكمية",
+        subtotal: "المجموع الفرعي",
+        remove: "حذف",
+        emptyCart: "السلة فارغة",
+        orderEmpty: "السلة فارغة، أضف منتج أول",
+        sizeLabel: "الحجم",
+        productLabels: { cold: "بارد", dessert: "حلى", dates: "تمور" },
+        products: {
+          1: { name: "آيس سبانش لاتيه", sub: "ice spanish latte", desc: "مشروب بارد بطابع كريمي فاخر وتوازن مثالي بين القهوة والحلا.", sizes: ["Small","Medium","Large"] },
+          2: { name: "أمريكانو", sub: "Americano", desc: "قهوة واضحة ونظيفة بطعم متوازن لمحبي النكهة الصريحة.", sizes: ["Single","Regular","Large"] },
+          3: { name: "في 60", sub: "V60", desc: "تحضير مختص بنكهة أنعم ولمسة راقية في التقديم.", sizes: ["Hot","Iced","Large"] },
+          4: { name: "تشيز كيك", sub: "CHEESECAKE", desc: "حلى مخملي أنيق يكمّل القهوة ويعطي إحساس تقديم فاخر.", sizes: ["Slice","Regular","Large"] },
+          5: { name: "كوكيز", sub: "cookies", desc: "كوكيز طازجة بطابع بسيط ومحبوب تناسب كل وقت.", sizes: ["1 Pc","2 Pcs","Box"] },
+          6: { name: "تمر العجوة", sub: "Acve Hurması", desc: "تمر فاخر غني ومناسب للتقديم الراقي مع القهوة.", sizes: ["250g","500g","1kg"] },
+          7: { name: "تمر مبروم", sub: "Mebrum Hurması", desc: "اختيار تمر فاخر بقوام مميز وطابع ضيافة أنيق.", sizes: ["250g","500g","1kg"] }
+        },
+          myOrders: "طلباتي",
+          myOrdersTitle : "طلباتك",
+          emptyOrders : "ما عندك طلبات إلى الآن",
+
+          
+        
+      },
+      en: {
+        brandTitle: "COFFEE VIP",
+        brandSubtitle: "A premium experience inspired by coffee and dates",
+        featured1Badge: "Signature Coffee",
+        featured1Title: "Spanish Latte",
+        featured1Desc: "Creamy, balanced, and crafted for a luxurious café experience.",
+        featured2Badge: "Premium Dessert",
+        featured2Title: "Cheesecake",
+        featured2Desc: "Smooth, rich, and designed to complete a refined coffee moment.",
+        tabs: { all: "All", cold: "Cold Drinks", dessert: "Desserts", dates: "Dates" },
+        sectionSub: "VIP preview",
+        add: "Add",
+        cart: "Cart",
+        cartButton: "Cart",
+        order: "Send order",
+        items: "Items",
+        total: "Total",
+        each: "Unit Price",
+        qty: "Qty",
+        subtotal: "Subtotal",
+        remove: "Remove",
+        emptyCart: "Cart is empty",
+        orderEmpty: "Cart is empty, add an item first",
+        sizeLabel: "Size",
+        productLabels: { cold: "Cold", dessert: "Dessert", dates: "Dates" },
+        products: {
+          1: { name: "Iced Spanish Latte", sub: "ice spanish latte", desc: "A premium iced coffee with a creamy body and balanced sweetness.", sizes: ["Small","Medium","Large"] },
+          2: { name: "Americano", sub: "Americano", desc: "Clean and bold coffee for those who enjoy a direct taste.", sizes: ["Single","Regular","Large"] },
+          3: { name: "V60", sub: "V60", desc: "Specialty-style brewing with a smoother and more refined profile.", sizes: ["Hot","Iced","Large"] },
+          4: { name: "Cheesecake", sub: "CHEESECAKE", desc: "A velvety dessert that pairs beautifully with coffee.", sizes: ["Slice","Regular","Large"] },
+          5: { name: "Cookies", sub: "cookies", desc: "Fresh cookies with a simple and crowd-pleasing flavor.", sizes: ["1 Pc","2 Pcs","Box"] },
+          6: { name: "Ajwa Dates", sub: "Acve Hurması", desc: "Premium dates with a rich character for elegant serving.", sizes: ["250g","500g","1kg"] },
+          7: { name: "Mabroom Dates", sub: "Mebrum Hurması", desc: "A refined date selection with a premium hospitality feel.", sizes: ["250g","500g","1kg"] }
+        },
+         myOrders: "My Orders",
+         myOrdersTitle: "My Orders",
+         emptyOrders: "You have no orders yet",
+      },
+      tr: {
+        brandTitle: "COFFEE VIP",
+        brandSubtitle: "Kahve ve hurmadan ilham alan premium deneyim",
+        featured1Badge: "Özel Kahve",
+        featured1Title: "Spanish Latte",
+        featured1Desc: "Kremamsı ve dengeli yapısıyla premium kafe deneyimi sunar.",
+        featured2Badge: "Premium Tatlı",
+        featured2Title: "Cheesecake",
+        featured2Desc: "Kahve anını tamamlayan yumuşak ve zengin lezzet.",
+        tabs: { all: "Tümü", cold: "Soğuk İçecekler", dessert: "Tatlı", dates: "Hurmalar" },
+        sectionSub: "VIP önizleme",
+        add: "Ekle",
+        cart: "Sepet",
+        cartButton: "Sepet",
+        order: "Sipariş Gönder",
+        items: "Ürün Sayısı",
+        total: "Toplam",
+        each: "Birim Fiyat",
+        qty: "Adet",
+        subtotal: "Ara Toplam",
+        remove: "Sil",
+        emptyCart: "Sepet boş",
+        orderEmpty: "Sepet boş, önce ürün ekleyin",
+        sizeLabel: "Boyut",
+        productLabels: { cold: "Soğuk", dessert: "Tatlı", dates: "Hurma" },
+        products: {
+          1: { name: "ice spanish latte", sub: "ice spanish latte", desc: "Kremamsı yapısı ve dengeli tadıyla premium soğuk kahve deneyimi.", sizes: ["Small","Medium","Large"] },
+          2: { name: "Americano", sub: "Americano", desc: "Net ve güçlü tadıyla sade kahve sevenler için ideal.", sizes: ["Single","Regular","Large"] },
+          3: { name: "V60", sub: "V60", desc: "Daha rafine ve yumuşak içimli özel demleme deneyimi.", sizes: ["Hot","Iced","Large"] },
+          4: { name: "CHEESECAKE", sub: "CHEESECAKE", desc: "Kahveyle uyumlu, yumuşak dokulu özel tatlı.", sizes: ["Slice","Regular","Large"] },
+          5: { name: "cookies", sub: "cookies", desc: "Her an için uygun, taze ve sevilen kurabiye seçeneği.", sizes: ["1 Pc","2 Pcs","Box"] },
+          6: { name: "Acve Hurması", sub: "Acve Hurması", desc: "Şık sunum için uygun, premium karakterli hurma.", sizes: ["250g","500g","1kg"] },
+          7: { name: "Mebrum Hurması", sub: "Mebrum Hurması", desc: "Premium ikram hissi veren seçkin hurma alternatifi.", sizes: ["250g","500g","1kg"] }
+        },
+         myOrders: "Siparişlerim",
+         myOrdersTitle: "Siparişlerim",
+         emptyOrders: "Henüz siparişiniz yok",
+      }
+    };
+
+    const products = [
+      { id: 1, category: "cold", image: "ice-spanish-latte.jpg", price: 170, rating: "4.8/5" },
+      { id: 2, category: "cold", image: "americano.jpg", price: 140, rating: "4.7/5" },
+      { id: 3, category: "cold", image: "v60.jpg", price: 180, rating: "4.8/5" },
+      { id: 4, category: "dessert", image: "cheesecake.jpg", price: 120, rating: "4.7/5" },
+      { id: 5, category: "dessert", image: "cookies.jpg", price: 120, rating: "4.6/5" },
+      { id: 6, category: "dates", image: "acve-hurmasi.jpg", price: 550, rating: "4.9/5" },
+      { id: 7, category: "dates", image: "mebrum-hurmasi.jpg", price: 400, rating: "4.8/5" }
+    ];
+
+    function getProductById(id) {
+      return products.find(p => p.id === id);
+    }
+
+    function getQty(id) {
+      return cart[id]?.qty || 0;
+    }
+
+    function getSelectedSize(id) {
+      const sizes = texts[currentLang].products[id].sizes;
+      return selectedSizes[id] || sizes[0];
+    }
+
+    function getCartItems() {
+      return Object.keys(cart).map(id => {
+        const pid = Number(id);
+        const product = getProductById(pid);
+        const item = cart[pid];
+        return {
+          ...product,
+          qty: item.qty,
+          size: item.size,
+          subtotal: item.qty * product.price
+        };
+      });
+    }
+
+    function getTotalItems() {
+      return getCartItems().reduce((sum, item) => sum + item.qty, 0);
+    }
+
+    function getTotalPrice() {
+      return getCartItems().reduce((sum, item) => sum + item.subtotal, 0);
+    }
+
+    function renderLanguages() {
+      const box = document.getElementById("langSwitcher");
+      const langs = [
+        { code: "ar", label: "العربية" },
+        { code: "en", label: "English" },
+        { code: "tr", label: "Türkçe" }
+      ];
+
+      box.innerHTML = langs.map(lang => `
+        <button class="lang-btn ${currentLang === lang.code ? "active" : ""}" onclick="setLanguage('${lang.code}')">
+          ${lang.label}
+        </button>
+      `).join("");
+    }
+
+    function renderTabs() {
+      const box = document.getElementById("tabs");
+      const tabs = texts[currentLang].tabs;
+      box.innerHTML = Object.keys(tabs).map(key => `
+        <button class="tab-btn ${currentTab === key ? "active" : ""}" onclick="setTab('${key}')">
+          ${tabs[key]}
+        </button>
+      `).join("");
+    }
+
+    function renderStaticTexts() {
+      document.documentElement.lang = currentLang;
+      document.documentElement.dir = currentLang === "ar" ? "rtl" : "ltr";
+      document.getElementById("myOrdersText").textContent = texts[currentLang].myOrders;
+      document.getElementById("ordersDrawerTitle").textContent = texts[currentLang].myOrdersTitle;
+
+      document.getElementById("brandTitle").textContent = texts[currentLang].brandTitle;
+      document.getElementById("brandSubtitle").textContent = texts[currentLang].brandSubtitle;
+      document.getElementById("featuredBadge1").textContent = texts[currentLang].featured1Badge;
+      document.getElementById("featuredTitle1").textContent = texts[currentLang].featured1Title;
+      document.getElementById("featuredDesc1").textContent = texts[currentLang].featured1Desc;
+      document.getElementById("featuredBadge2").textContent = texts[currentLang].featured2Badge;
+      document.getElementById("featuredTitle2").textContent = texts[currentLang].featured2Title;
+      document.getElementById("featuredDesc2").textContent = texts[currentLang].featured2Desc;
+      document.getElementById("sectionTitle").textContent = texts[currentLang].tabs[currentTab];
+      document.getElementById("sectionSub").textContent = texts[currentLang].sectionSub;
+      document.getElementById("cartTitle").textContent = texts[currentLang].cart;
+      document.getElementById("orderBtn").textContent = texts[currentLang].order;
+      updateCartInfo();
+      updateCartButton();
+      renderCustomerOrders();
+    }
+
+    function renderProducts() {
+      const grid = document.getElementById("grid");
+      const filtered = currentTab === "all" ? products : products.filter(p => p.category === currentTab);
+
+      grid.innerHTML = filtered.map(product => {
+        const t = texts[currentLang].products[product.id];
+        const selected = getSelectedSize(product.id);
+
+        const available = isProductAvailable(product.id);
+         return `
+           <article class="card ${available ? "" : "sold-out"}">
+            <div class="card-image">
+              <img src="${product.image}" alt="${t.name}">
+              <div class="mini-pill">${texts[currentLang].productLabels[product.category]}</div>
+              ${!available ? '<div class="sold-out-badge">Sold Out</div>' : ""}
+            </div>
+
+            <div class="card-body">
+              <div class="name-row">
+                <h3 class="name">${t.name}</h3>
+                <div class="rating">⭐ ${product.rating}</div>
+              </div>
+
+              <p class="subname">${t.sub}</p>
+              <p class="price">TRY ${product.price.toFixed(2)}</p>
+
+              <div class="sizes">
+                ${t.sizes.map(size => `
+                 <div class="size ${selected === size ? "active" : ""} ${available ? "" : "disabled"}" onclick="setSize(${product.id}, '${size.replace(/'/g,"\\'")}')">
+                    ${size}
+                  </div>
+                `).join("")}
+              </div>
+
+              <p class="desc">${t.desc}</p>
+
+              <div class="action-row">
+                <div class="qty">
+                  <button class="qty-btn ${available ? "" : "disabled"}" onclick="decreaseQty(${product.id})">−</button>
+                  <span>${getQty(product.id)}</span><button class="add-btn ${available ? "" : "disabled"}" onclick="increaseQty(${product.id})">
+                   ${available ? texts[currentLang].add : texts[currentLang].soldOut}
+                    </button><button class="qty-btn ${available ? "" : "disabled"}" onclick="increaseQty(${product.id})">+</button>
+                </div>
+
+                <button class="add-btn" onclick="increaseQty(${product.id})">${texts[currentLang].add}</button>
+              </div>
+            </div>
+          </article>
+        `;
+      }).join("");
+    }
+
+    function setSize(productId, size) {
+      selectedSizes[productId] = size;
+      renderProducts();
+    }
+
+    function increaseQty(productId) {
+  if (!isProductAvailable(productId)) {
+    showToast(texts[currentLang].soldOut);
+    return;
+  }
+
+  const size = getSelectedSize(productId);
+  if (!cart[productId]) {
+    cart[productId] = { qty: 1, size };
+  } else {
+    cart[productId].qty += 1;
+    cart[productId].size = size;
+  }
+  renderProducts();
+  renderCart();
+  updateCartInfo();
+  updateCartButton();
+  showToast(texts[currentLang].products[productId].name);
+}
+
+    function decreaseQty(productId) {
+      if (!cart[productId]) return;
+      cart[productId].qty -= 1;
+      if (cart[productId].qty <= 0) delete cart[productId];
+      renderProducts();
+      renderCart();
+      updateCartInfo();
+      updateCartButton();
+    }
+
+    function removeItem(productId) {
+      delete cart[productId];
+      renderProducts();
+      renderCart();
+      updateCartInfo();
+      updateCartButton();
+    }
+
+    function renderCart() {
+      const body = document.getElementById("cartBody");
+      const items = getCartItems();
+
+      if (!items.length) {
+        body.innerHTML = `<div class="empty-cart">${texts[currentLang].emptyCart}</div>`;
+        return;
+      }
+
+      let html = "";
+
+      items.forEach(item => {
+        const t = texts[currentLang].products[item.id];
+        html += `
+          <div class="cart-item">
+            <div class="cart-item-top">
+              <div>
+                <h4 class="cart-item-name">${t.name}</h4>
+                <div class="cart-item-sub">
+                  ${texts[currentLang].sizeLabel}: ${item.size} • ${texts[currentLang].each}: TRY ${item.price.toFixed(2)}
+                </div>
+              </div>
+              <button class="remove-btn" onclick="removeItem(${item.id})">${texts[currentLang].remove}</button>
+            </div>
+
+            <div class="summary">
+              <div class="summary-line">
+                <span>${texts[currentLang].qty}</span>
+                <span>${item.qty}</span>
+              </div>
+              <div class="summary-line">
+                <span>${texts[currentLang].subtotal}</span>
+                <span>TRY ${item.subtotal.toFixed(2)}</span>
+              </div>
+            </div>
+          </div>
+        `;
+      });
+
+      html += `
+        <div class="summary">
+          <div class="summary-line">
+            <span>${texts[currentLang].items}</span>
+            <span>${getTotalItems()}</span>
+          </div>
+          <div class="summary-line">
+            <span>${texts[currentLang].total}</span>
+            <span>TRY ${getTotalPrice().toFixed(2)}</span>
+          </div>
+        </div>
+      `;
+
+      body.innerHTML = html;
+    }
+
+    function updateCartInfo() {
+      document.getElementById("cartInfo").textContent =
+        `${texts[currentLang].items}: ${getTotalItems()} | ${texts[currentLang].total}: TRY ${getTotalPrice().toFixed(2)}`;
+    }
+
+    function updateCartButton() {
+      document.getElementById("cartBtn").textContent =
+        `${texts[currentLang].cartButton} (${getTotalItems()})`;
+    }
+
+    function setLanguage(lang) {
+      currentLang = lang;
+      renderLanguages();
+      renderTabs();
+      renderStaticTexts();
+      renderProducts();
+      renderCart();
+    }
+
+    function setTab(tab) {
+      currentTab = tab;
+      renderTabs();
+      renderStaticTexts();
+      renderProducts();
+    }
+
+    function openCart() {
+      document.getElementById("cartOverlay").classList.add("show");
+      document.getElementById("cartPanel").classList.add("show");
+    }
+
+    function closeCart() {
+      document.getElementById("cartOverlay").classList.remove("show");
+      document.getElementById("cartPanel").classList.remove("show");
+    }
+
+    async function sendOrder() {
+      const items = getCartItems();
+
+      if (!items.length) {
+        showToast(texts[currentLang].orderEmpty);
+        return;
+      }
+
+      const customerName = document.getElementById("customerName")?.value.trim() || "";
+      const customerPhone = document.getElementById("customerPhone")?.value.trim() || "";
+
+      if (!customerName) {
+        showToast("اكتب الاسم أول");
+        return;
+      }
+
+      const payloadItems = items.map(item => {
+        const t = texts[currentLang].products[item.id];
+        return {
+          id: item.id,
+          name: t.name,
+          size: item.size,
+          qty: item.qty,
+          unit_price: item.price,
+          subtotal: item.subtotal
+        };
+      });
+
+      const payload = {
+        customer_name: customerName,
+        phone: customerPhone || null,
+        order_type: "vip-demo",
+        table_number: null,
+        items: payloadItems,
+        total: getTotalPrice(),
+        status: "new"
+      };
+
+      const { data, error } = await supabaseClient
+        .from("orders")
+        .insert(payload)
+        .select()
+        .single();
+
+      if (error) {
+        console.error(error);
+        showToast("صار خطأ");
+        return;
+      }
+
+      customerOrders.push(data);
+      saveCustomerOrders();
+      renderCustomerOrders();
+      updateMyOrdersCount();
+      openOrdersDrawer();
+
+      showToast(`تم إرسال الطلب #${data.id}`);
+
+      cart = {};
+      renderProducts();
+      renderCart();
+      updateCartInfo();
+      updateCartButton();
+
+      const nameInput = document.getElementById("customerName");
+      const phoneInput = document.getElementById("customerPhone");
+      if (nameInput) nameInput.value = "";
+      if (phoneInput) phoneInput.value = "";
+    }
+
+    function showToast(message) {
+      const toast = document.getElementById("toast");
+      toast.textContent = message;
+      toast.classList.add("show");
+      clearTimeout(toast.timer);
+      toast.timer = setTimeout(() => toast.classList.remove("show"), 1200);
+    }
+
+    let currentSlide = 0;
+
+    function slidesToDots(count) {
+      let html = "";
+      for (let i = 0; i < count; i++) {
+        html += `<div class="dot ${i === 0 ? "active" : ""}"></div>`;
+      }
+      return html;
+    }
+
+    function initSlider() {
+      const slides = document.querySelectorAll(".slide");
+      const dotsBox = document.getElementById("slideDots");
+      dotsBox.innerHTML = slides.length ? slidesToDots(slides.length) : "";
+
+      setInterval(() => {
+        const slides = document.querySelectorAll(".slide");
+        const dots = document.querySelectorAll(".dot");
+        slides[currentSlide].classList.remove("active");
+        dots[currentSlide].classList.remove("active");
+        currentSlide = (currentSlide + 1) % slides.length;
+        slides[currentSlide].classList.add("active");
+        dots[currentSlide].classList.add("active");
+      }, 2000);
+    }
+
+    renderLanguages();
+    renderTabs();
+    renderStaticTexts();
+    renderProducts();
+    renderCart();
+    renderCustomerOrders();
+    updateMyOrdersCount();
+    initSlider();
+    loadStockStatus();
+    setInterval(refreshCustomerOrdersStatus, 3000);
+    setInterval(loadStockStatus, 1000);
+    
+  </script>
+</body>
+</html>

@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Coffee Orders Dashboard</title>
+  <style>
+    :root{
+      --bg:#f6efe8;
+      --card:#ffffff;
+      --text:#2b1a12;
+      --muted:#7a6557;
+      --primary:#9b5a33;
+      --soft:#f3e4d6;
+      --line:#ead8ca;
+      --shadow:0 8px 20px rgba(0,0,0,0.08);
+    }
+
+    *{box-sizing:border-box}
+
+    body{
+      margin:0;
+      font-family:Arial,sans-serif;
+      background:var(--bg);
+      color:var(--text);
+    }
+
+    .wrap{
+      max-width:980px;
+      margin:auto;
+      padding:20px;
+    }
+
+    .topbar{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      margin-bottom:18px;
+      flex-wrap:wrap;
+    }
+
+    h1{
+      margin:0;
+      font-size:28px;
+    }
+
+    .meta{
+      color:var(--muted);
+      font-weight:700;
+    }
+
+    .refresh-btn{
+      border:0;
+      background:var(--primary);
+      color:#fff;
+      padding:12px 16px;
+      border-radius:14px;
+      cursor:pointer;
+      font-weight:700;
+    }
+
+    .orders{
+      display:grid;
+      gap:14px;
+    }
+
+    .order{
+      background:var(--card);
+      border-radius:18px;
+      padding:16px;
+      box-shadow:var(--shadow);
+      border:1px solid var(--line);
+    }
+
+    .order-head{
+      display:flex;
+      justify-content:space-between;
+      gap:12px;
+      align-items:flex-start;
+      flex-wrap:wrap;
+      margin-bottom:10px;
+    }
+
+    .order-title{
+      margin:0;
+      font-size:20px;
+    }
+
+    .status{
+      display:inline-block;
+      padding:8px 12px;
+      border-radius:999px;
+      background:var(--soft);
+      color:var(--primary);
+      font-size:13px;
+      font-weight:700;
+    }
+
+    .order-info{
+      color:var(--muted);
+      line-height:1.8;
+      font-size:14px;
+      margin-bottom:12px;
+      font-weight:700;
+    }
+
+    .items-box{
+      background:#fffaf5;
+      border:1px solid var(--line);
+      border-radius:16px;
+      padding:12px;
+    }
+
+    .item{
+      padding:8px 0;
+      border-bottom:1px dashed #e6d3c5;
+      font-size:14px;
+      font-weight:700;
+    }
+
+    .item:last-child{
+      border-bottom:0;
+    }
+
+    .empty{
+      text-align:center;
+      color:var(--muted);
+      padding:40px 20px;
+      font-weight:700;
+      background:#fff;
+      border-radius:18px;
+      border:1px solid var(--line);
+      box-shadow:var(--shadow);
+    }
+
+    .done-btn{
+      border:0;
+      background:#2f8f57;
+      color:#fff;
+      padding:8px 12px;
+      border-radius:12px;
+      cursor:pointer;
+      font-size:13px;
+      font-weight:700;
+    }
+
+    .dash-tabs{
+      display:flex;
+      gap:10px;
+      margin-bottom:18px;
+      flex-wrap:wrap;
+    }
+
+    .dash-tab{
+      border:0;
+      background:#ead8ca;
+      color:#6a4a36;
+      padding:10px 14px;
+      border-radius:14px;
+      cursor:pointer;
+      font-weight:800;
+      font-size:14px;
+    }
+
+    .dash-tab.active{
+      background:var(--primary);
+      color:#fff;
+    }
+
+    .tab-section{
+      display:none;
+      margin-top:8px;
+    }
+
+    .tab-section.active{
+      display:block;
+    }
+  </style>
+</head>
+<body>
+  <audio id="notifySound" preload="auto">
+    <source src="https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3" type="audio/mpeg">
+  </audio>
+
+  <div class="wrap">
+    <div class="topbar">
+      <div>
+        <h1>Coffee orders</h1>
+        <div class="meta">Order Board - Live Update</div>
+      </div>
+      <button class="refresh-btn" onclick="refreshAll()">update</button>
+    </div>
+
+    <div class="dash-tabs">
+      <button type="button" class="dash-tab active" id="tabCurrentBtn" onclick="setDashTab('current')">Orders</button>
+      <button type="button" class="dash-tab" id="tabHistoryBtn" onclick="setDashTab('history')">Previous Orders</button>
+      <button type="button" class="dash-tab" id="tabProductsBtn" onclick="setDashTab('products')">Products</button>
+    </div>
+
+    <div class="tab-section active" id="currentSection">
+      <div class="orders" id="orders">
+        <div class="empty">جاري تحميل الطلبات...</div>
+      </div>
+    </div>
+
+    <div class="tab-section" id="historySection">
+      <div class="orders" id="historyOrders">
+        <div class="empty">جاري تحميل الطلبات السابقة...</div>
+      </div>
+    </div>
+
+    <div class="tab-section" id="productsSection">
+      <div class="orders" id="stockControls">
+        <div class="empty">جاري تحميل المنتجات...</div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    const SUPABASE_URL = "https://nykpbfiwjujamxghwgto.supabase.co";
+    const SUPABASE_KEY = "sb_publishable_FzncDW28HfkBkAfHjVN7SA_8aZIy1_M";
+    const client = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    const productNames = {
+      1: "Iced Spanish Latte",
+      2: "Americano",
+      3: "V60",
+      4: "Cheesecake",
+      5: "Cookies",
+      6: "Ajwa Dates",
+      7: "Mabroom Dates"
+    };
+
+    let lastOrderId = null;
+    let firstLoadDone = false;
+    let soundEnabled = false;
+
+    document.addEventListener("click", () => {
+      soundEnabled = true;
+    }, { once: true });
+
+    document.addEventListener("keydown", (e) => {
+      if (e.key.toLowerCase() === "p") {
+        const sound = document.getElementById("notifySound");
+        if (sound) {
+          sound.currentTime = 0;
+          sound.play().catch(err => console.log(err));
+        }
+      }
+    });
+
+    function setDashTab(tab) {
+      const currentBtn = document.getElementById("tabCurrentBtn");
+      const historyBtn = document.getElementById("tabHistoryBtn");
+      const productsBtn = document.getElementById("tabProductsBtn");
+
+      const currentSection = document.getElementById("currentSection");
+      const historySection = document.getElementById("historySection");
+      const productsSection = document.getElementById("productsSection");
+
+      currentBtn.classList.remove("active");
+      historyBtn.classList.remove("active");
+      productsBtn.classList.remove("active");
+
+      currentSection.classList.remove("active");
+      historySection.classList.remove("active");
+      productsSection.classList.remove("active");
+
+      if (tab === "current") {
+        currentBtn.classList.add("active");
+        currentSection.classList.add("active");
+      } else if (tab === "history") {
+        historyBtn.classList.add("active");
+        historySection.classList.add("active");
+      } else if (tab === "products") {
+        productsBtn.classList.add("active");
+        productsSection.classList.add("active");
+      }
+    }
+
+    async function loadOrders() {
+      const ordersBox = document.getElementById("orders");
+      if (!ordersBox) return;
+
+      const { data, error } = await client
+        .from("orders")
+        .select("*")
+        .order("created_at", { ascending: false });
+
+      if (error) {
+        console.error("Supabase error:", error);
+        ordersBox.innerHTML = `<div class="empty">صار خطأ في جلب الطلبات</div>`;
+        return;
+      }
+
+      if (!data || data.length === 0) {
+        ordersBox.innerHTML = `<div class="empty">ما فيه طلبات إلى الآن</div>`;
+        return;
+      }
+
+      const newestOrderId = data[0]?.id ?? null;
+
+      if (!firstLoadDone) {
+        lastOrderId = newestOrderId;
+        firstLoadDone = true;
+      } else if (newestOrderId && newestOrderId !== lastOrderId) {
+        if (soundEnabled) {
+          const sound = document.getElementById("notifySound");
+          if (sound) {
+            sound.currentTime = 0;
+            sound.play().catch(err => console.log("sound blocked", err));
+          }
+        }
+        lastOrderId = newestOrderId;
+      }
+
+      const currentOrders = data.filter(order => order.status !== "done");
+
+      if (!currentOrders.length) {
+        ordersBox.innerHTML = `<div class="empty">ما فيه طلبات حالية</div>`;
+        return;
+      }
+
+      ordersBox.innerHTML = currentOrders.map(order => `
+        <div class="order">
+          <div class="order-head">
+            <div>
+              <h3 class="order-title">${order.customer_name || "بدون اسم"}</h3>
+            </div>
+            <div style="display:flex; gap:8px; align-items:center;">
+              <div class="status">${order.status || "new"}</div>
+              <button class="done-btn" onclick="markDone(${order.id})">Done</button>
+            </div>
+          </div>
+
+          <div class="order-info">
+            Phone number: ${order.phone || "-"}<br>
+            Order type : ${order.order_type || "-"}<br>
+            Table number : ${order.table_number || "-"}<br>
+            Total: TRY ${Number(order.total || 0).toFixed(2)}<br>
+            Time: ${new Date(order.created_at).toLocaleString("ar-SA")}
+          </div>
+
+          <div class="items-box">
+            ${(order.items || []).map(item => `
+              <div class="item">
+                ${item.name} (${item.size}) × ${item.qty} = TRY ${Number(item.subtotal || 0).toFixed(2)}
+              </div>
+            `).join("")}
+          </div>
+        </div>
+      `).join("");
+    }
+
+    async function loadHistoryOrders() {
+      const historyBox = document.getElementById("historyOrders");
+      if (!historyBox) return;
+
+      const { data, error } = await client
+        .from("orders")
+        .select("*")
+        .order("created_at", { ascending: false });
+
+      if (error) {
+        console.error(error);
+        historyBox.innerHTML = `<div class="empty">صار خطأ في جلب الطلبات السابقة</div>`;
+        return;
+      }
+
+      const historyOrders = (data || []).filter(order => order.status === "done");
+
+      if (!historyOrders.length) {
+        historyBox.innerHTML = `<div class="empty">ما فيه طلبات سابقة</div>`;
+        return;
+      }
+
+      historyBox.innerHTML = historyOrders.map(order => `
+        <div class="order">
+          <div class="order-head">
+            <div>
+              <h3 class="order-title">${order.customer_name || "بدون اسم"}</h3>
+            </div>
+            <div class="status">${order.status || "done"}</div>
+          </div>
+
+          <div class="order-info">
+            Phone number: ${order.phone || "-"}<br>
+            Order type : ${order.order_type || "-"}<br>
+            Table number : ${order.table_number || "-"}<br>
+            Total: TRY ${Number(order.total || 0).toFixed(2)}<br>
+            Time: ${new Date(order.created_at).toLocaleString("ar-SA")}
+          </div>
+
+          <div class="items-box">
+            ${(order.items || []).map(item => `
+              <div class="item">
+                ${item.name} (${item.size}) × ${item.qty} = TRY ${Number(item.subtotal || 0).toFixed(2)}
+              </div>
+            `).join("")}
+          </div>
+        </div>
+      `).join("");
+    }
+
+    async function loadStockControls() {
+      const stockBox = document.getElementById("stockControls");
+      if (!stockBox) return;
+
+      const { data, error } = await client
+        .from("product_stock")
+        .select("*")
+        .order("product_id", { ascending: true });
+
+      if (error) {
+        console.error(error);
+        stockBox.innerHTML = `<div class="empty">صار خطأ في تحميل حالة المنتجات</div>`;
+        return;
+      }
+
+      if (!data || !data.length) {
+        stockBox.innerHTML = `<div class="empty">ما فيه منتجات</div>`;
+        return;
+      }
+
+      stockBox.innerHTML = data.map(item => `
+        <div class="order">
+          <div class="order-head">
+            <div>
+              <h3 class="order-title">${productNames[item.product_id] || `Product ${item.product_id}`}</h3>
+            </div>
+            <div class="status">${item.is_available ? "Available" : "Sold Out"}</div>
+          </div>
+
+          <div style="display:flex; gap:8px; margin-top:10px; flex-wrap:wrap;">
+            <button class="refresh-btn" onclick="setStock(${item.product_id}, false)">Sold Out</button>
+            <button class="refresh-btn" onclick="setStock(${item.product_id}, true)">Available</button>
+          </div>
+        </div>
+      `).join("");
+    }
+
+    async function setStock(productId, isAvailable) {
+      const { error } = await client
+        .from("product_stock")
+        .update({
+          is_available: isAvailable,
+          updated_at: new Date().toISOString()
+        })
+        .eq("product_id", productId);
+
+      if (error) {
+        console.error(error);
+        alert("صار خطأ");
+        return;
+      }
+
+      loadStockControls();
+    }
+
+    async function markDone(orderId) {
+      const { error } = await client
+        .from("orders")
+        .update({ status: "done" })
+        .eq("id", orderId);
+
+      if (error) {
+        console.error("Update error:", error);
+        alert("صار خطأ في تحديث الطلب");
+        return;
+      }
+
+      refreshAll();
+    }
+
+    async function refreshAll() {
+      await loadOrders();
+      await loadHistoryOrders();
+      await loadStockControls();
+    }
+
+    refreshAll();
+
+    client
+      .channel("orders-live")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "orders" },
+        () => {
+          loadOrders();
+          loadHistoryOrders();
+        }
+      )
+      .subscribe();
+
+    client
+      .channel("stock-live")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "product_stock" },
+        () => {
+          loadStockControls();
+        }
+      )
+      .subscribe();
+  </script>
+</body>
+</html>
