@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Palmu Dashboard</title>
+  <link rel="stylesheet" href="./css/dashboard.css">
+</head>
+
+<body>
+  <audio id="notifySound" preload="auto">
+    <source src="https://assets.mixkit.co/active_storage/sfx/2868/2868-preview.mp3" type="audio/mpeg">
+  </audio>
+
+  <div class="wrap">
+    <div class="topbar">
+      <div>
+        <h1>Palmu Orders</h1>
+        <div class="meta" id="dashboardMeta">Live dashboard</div>
+      </div>
+      <button class="refresh-btn" onclick="refreshAll()">تحديث</button>
+    </div>
+
+    <div class="stats">
+      <div class="stat-card">
+        <span>طلبات حالية</span>
+        <strong id="currentCount">0</strong>
+      </div>
+      <div class="stat-card">
+        <span>طلبات اليوم</span>
+        <strong id="todayCount">0</strong>
+      </div>
+      <div class="stat-card">
+        <span>Business Day</span>
+        <strong id="businessDayText">-</strong>
+      </div>
+    </div>
+
+    <div class="dash-tabs">
+      <button type="button" class="dash-tab active" id="tabCurrentBtn" onclick="setDashTab('current')">الطلبات</button>
+      <button type="button" class="dash-tab" id="tabHistoryBtn" onclick="setDashTab('history')">السابقة</button>
+      <button type="button" class="dash-tab" id="tabProductsBtn" onclick="setDashTab('products')">التوفر</button>
+      <button type="button" class="dash-tab" id="tabSettingsBtn" onclick="setDashTab('settings')">⚙️</button>
+    </div>
+
+    <div class="tab-section active" id="currentSection">
+      <div class="orders" id="orders"></div>
+    </div>
+
+    <div class="tab-section" id="historySection">
+      <div class="orders" id="historyOrders"></div>
+    </div>
+
+    <div class="tab-section" id="productsSection">
+      <div class="orders" id="stockControls"></div>
+    </div>
+
+    <div class="tab-section" id="settingsSection">
+      <div class="settings-menu">
+        <button class="settings-btn active" onclick="setSettingsView('home')" id="settingsHomeBtn">الرئيسية</button>
+        <button class="settings-btn" onclick="setSettingsView('hero')" id="settingsHeroBtn">الهيرو</button>
+        <button class="settings-btn" onclick="setSettingsView('addProduct')" id="settingsAddProductBtn">إضافة منتج</button>
+        <button class="settings-btn" onclick="setSettingsView('editProduct')" id="settingsEditProductBtn">تعديل منتج</button>
+        <button class="settings-btn" onclick="setSettingsView('category')" id="settingsCategoryBtn">إضافة قائمة</button>
+        <button class="settings-btn" onclick="setSettingsView('stockPicker')" id="settingsStockPickerBtn">منتجات التوفر</button>
+      </div>
+
+      <div class="orders" id="settingsContent"></div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="./js/config.js"></script>
+  <script src="./js/products.js"></script>
+  <script src="./js/orders.js"></script>
+  <script src="./js/dashboard.js"></script>
+</body>
+</html>

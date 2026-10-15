@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Palmu</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Tajawal:wght@500;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./css/style.css">
+</head>
+
+<body>
+ <div id="intro">
+  <img class="intro-image" src="./images/intro.png" alt="Palmu intro">
+</div>
+  <button class="my-orders-fab" id="myOrdersBtn" onclick="openOrdersDrawer()">
+    <span id="myOrdersText">طلباتي</span>
+    <span class="my-orders-badge" id="myOrdersCount">0</span>
+  </button>
+  <div class="orders-top-overlay" id="ordersTopOverlay" onclick="closeOrdersDrawer()"></div>
+
+  <div class="orders-drawer" id="ordersDrawer">
+    <div class="orders-drawer-head">
+      <h3 class="orders-drawer-title" id="ordersDrawerTitle">طلباتك</h3>
+      <button class="orders-drawer-close" onclick="closeOrdersDrawer()">×</button>
+    </div>
+    <div class="orders-drawer-body" id="ordersDrawerBody"></div>
+  </div>
+
+  <div class="page">
+    <section class="hero">
+      <div class="brand">
+        <img src="./images/logo.png" alt="Palmu" class="logo">
+        <div>
+          <h1 id="brandTitle">Palmu</h1>
+          <p id="brandSubtitle">تجربة فاخرة مستوحاة من القهوة والتمور</p>
+        </div>
+      </div>
+    </section>
+      <div id="tableBadge" class="table-badge"></div>
+
+    <div class="lang-switcher" id="langSwitcher"></div>
+
+    <section class="featured-wrap">
+      <div class="slide-dots" id="slideDots"></div>
+      <div id="heroContainer"></div>
+    </section>
+
+    <div class="tabs" id="tabs"></div>
+
+    <div class="section-head">
+      <h2 class="section-title" id="sectionTitle">الكل</h2>
+      <div class="section-sub" id="sectionSub">عرض Palmu</div>
+    </div>
+
+    <section class="grid" id="grid"></section>
+
+    <section class="customer-panel">
+      <h3 id="customerInfoTitle">معلومات الطلب</h3>
+      <input id="customerName" type="text" placeholder="الاسم الكامل">
+    </section>
+
+    <footer class="footer-credit">
+    <a id="developerLink" href="#" target="_blank" rel="noopener" class="powered-by">
+     Powered by MV
+     </a>
+    </footer>
+
+  <div class="bottom-bar">
+    <div class="bottom-inner">
+      <div class="cart-info" id="cartInfo">عدد المنتجات: 0 | الإجمالي: TRY 0.00</div>
+      <div class="bottom-actions">
+        <button class="cart-btn" id="cartBtn" onclick="openCart()">السلة (0)</button>
+        <button class="order-btn" id="orderBtn" onclick="sendOrder()">ارسل الطلب</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="cart-overlay" id="cartOverlay" onclick="closeCart()"></div>
+
+  <div class="cart-panel" id="cartPanel">
+    <div class="cart-head">
+      <h3 id="cartTitle">السلة</h3>
+      <button class="close-cart" onclick="closeCart()">×</button>
+    </div>
+    <div class="cart-body" id="cartBody"></div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="./js/config.js"></script>
+  <script src="./js/products.js"></script>
+  <script src="./js/orders.js"></script>
+  <script src="./js/menu.js"></script>
+</body>
+</html>
